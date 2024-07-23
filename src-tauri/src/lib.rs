@@ -20,8 +20,11 @@ pub enum ActionAfterSync {
 #[derive(Deserialize, Serialize)]
 pub struct Sync {
     server: String,
+    #[serde(rename = "autoUpdate")]
     auto_update: bool,
+    #[serde(rename = "autoSync")]
     auto_sync: bool,
+    #[serde(rename = "actionAfterSync")]
     action_after_sync: ActionAfterSync,
     command: String,
 }
@@ -30,6 +33,7 @@ pub struct Sync {
 pub struct Minecraft {
     version: String,
     isolate: bool,
+    #[serde(rename = "syncConfig")]
     sync_config: bool,
 }
 
