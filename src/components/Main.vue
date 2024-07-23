@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/tauri"
+import { Config } from "../config"
 
-const greetMsg = ref("");
-const path = ref("");
+// TODO 实现主界面
+
+const greetMsg = ref("")
+const path = ref("")
 
 async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-  greetMsg.value = await invoke("greet", { path: path.value });
+  const config: Config = JSON.parse(await invoke("greet", { path: path.value }))
+  greetMsg.value = JSON.stringify(config, null, 4)
 }
 </script>
 
@@ -17,6 +20,5 @@ async function greet() {
     <input id="greet-input" v-model="path" placeholder="Input config path" />
     <button type="submit">Greet</button>
   </form>
-
-  <p>{{ greetMsg }}</p>
+  <pre>{{ greetMsg }}</pre>
 </template>
