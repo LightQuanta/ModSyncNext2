@@ -58,15 +58,21 @@ pub struct Minecraft {
     sync_config: bool,
 }
 
+#[cfg(not(debug_assertions))]
+const CONFIG_PATH: &str = "./msnconfig.txt";
+
+#[cfg(debug_assertions)]
+const CONFIG_PATH: &str = "./sample_config.toml";
+
 pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
-    let config_exists = fs::metadata("./msnconfig.txt").is_ok();
+    let config_exists = fs::metadata(CONFIG_PATH).is_ok();
 
     let config_text = if !config_exists {
         let default_config = Config::default();
-        fs::write("./msnconfig.txt", toml::to_string(&default_config)?)?;
+        fs::write(CONFIG_PATH, toml::to_string(&default_config)?)?;
         toml::to_string(&default_config)?
     } else {
-         fs::read_to_string("./msnconfig.txt")?
+        fs::read_to_string(CONFIG_PATH)?
     };
 
     Ok(toml::from_str(&config_text)?)

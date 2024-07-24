@@ -1,0 +1,12 @@
+version = "2.0"
+[sync]
+server = "http://example.com/"
+autoUpdate = false
+autoSync = false
+actionAfterSync = "DoNothing"
+command = "./launch"
+
+[minecraft]
+version = "1.20"
+isolate = false
+syncConfig = false
