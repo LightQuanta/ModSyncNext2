@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/tauri"
-import { Config } from "../config"
+import { Config } from "@/components/config"
 
 // TODO 实现主界面
 

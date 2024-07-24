@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { Config, ActionAfterSync } from "../config.ts"
+import { Config, ActionAfterSync } from "@/config.ts"
 
 export const useConfigStore = defineStore('config', () => {
     const config = ref<Config>({

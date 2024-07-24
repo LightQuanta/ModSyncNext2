@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { invoke } from "@tauri-apps/api/tauri"
-import { Config } from "./config"
+import { Config } from "@/config"
 import { ElMessage } from "element-plus"
-import { useConfigStore } from "./store/config"
+import { useConfigStore } from "@/store/config"
 
-import Main from "./components/Main.vue";
+import Main from "@/components/Main.vue";
 
 
 onMounted(async () => {
