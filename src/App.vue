@@ -11,12 +11,23 @@ import Main from "@/components/Main.vue";
 onMounted(async () => {
   const configStore = useConfigStore()
   try {
-    const configText: string = await invoke("get_config");
-    if (configText.startsWith("error:")) {
-      throw new Error(configText)
+    if (await invoke("has_config")) {
+      const configText: string = await invoke("read_config");
+      if (configText.startsWith("error:")) {
+        throw new Error(configText)
+      }
+      const config: Config = JSON.parse(configText)
+      configStore.config = config
+    } else {
+      // TODO 实现默认配置创建
+      ElMessage({
+        type: "info",
+        message: `未发现配置文件，等待创建`,
+        showClose: true,
+        duration: 0,
+      })
+    
     }
-    const config: Config = JSON.parse(configText)
-    configStore.config = config
   } catch (error) {
     ElMessage({
       type: "error",

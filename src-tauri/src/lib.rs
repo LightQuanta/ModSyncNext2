@@ -64,17 +64,18 @@ const CONFIG_PATH: &str = "./msnconfig.txt";
 #[cfg(debug_assertions)]
 const CONFIG_PATH: &str = "./sample_config.toml";
 
+pub fn has_config() -> bool {
+    fs::metadata(CONFIG_PATH).is_ok()
+}
+
+pub fn create_default_config() -> Result<(), Box<dyn std::error::Error>> {
+    let default_config = Config::default();
+    fs::write(CONFIG_PATH, toml::to_string(&default_config).unwrap()).unwrap();
+    Ok(())
+}
+
 pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
-    let config_exists = fs::metadata(CONFIG_PATH).is_ok();
-
-    let config_text = if !config_exists {
-        let default_config = Config::default();
-        fs::write(CONFIG_PATH, toml::to_string(&default_config)?)?;
-        toml::to_string(&default_config)?
-    } else {
-        fs::read_to_string(CONFIG_PATH)?
-    };
-
+    let config_text = fs::read_to_string(CONFIG_PATH)?;
     Ok(toml::from_str(&config_text)?)
 }
 
