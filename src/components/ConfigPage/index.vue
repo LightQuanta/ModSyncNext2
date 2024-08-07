@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { ElAutocomplete, ElButton, ElInput, ElCheckbox, ElSelect, ElOption, ElForm, ElFormItem } from "element-plus";
+import { ElAutocomplete, ElButton, ElInput, ElCheckbox, ElSelect, ElOption, ElForm, ElFormItem, ElMessage, ElMessageBox } from "element-plus";
 import { ActionAfterSync } from "@/config"
 import useTempConfig from './hooks/useTempConfig'
 
 const {
     tempConfig,
-    tempConfigJSON,
-    configJSON,
     changed,
     syncConfigToStore,
+    discardChanges,
+    resetConfig,
 } = useTempConfig()
 
 // TODO 实现正确补全
@@ -25,15 +25,40 @@ const querySearch = (queryString: string, cb: any) => {
     cb(results)
 }
 
-// TODO 实现配置界面
+const saveConfig = () => {
+    syncConfigToStore()
+    ElMessage({
+        message: "保存成功",
+        type: "success",
+    })
+}
+
+const onDiscardChanges = () => {
+    ElMessageBox.confirm(
+        "确定要取消更改吗？",
+        "提示",
+        {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+        }
+    ).then(discardChanges)
+}
+
+const onResetConfig = () => {
+    ElMessageBox.confirm(
+        "确定要恢复默认配置吗？",
+        "提示",
+        {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+        }
+    ).then(resetConfig)
+}
 </script>
 
 <template>
-    temp:
-    <pre>{{ tempConfigJSON }}</pre>
-    store:
-    <pre>{{ configJSON }}</pre>
-    <p>{{ changed }}</p>
     <ElForm label-width="auto">
         <ElFormItem label="同步服务器网址">
             <ElInput v-model="tempConfig.sync.server" placeholder="同步服务器"></ElInput>
@@ -48,8 +73,9 @@ const querySearch = (queryString: string, cb: any) => {
             </ElSelect>
         </ElFormItem>
 
-        <ElFormItem label="同步后执行命令">
-            <ElInput v-model="tempConfig.sync.command" placeholder="同步后执行命令"></ElInput>
+        <ElFormItem label="同步后执行命令"
+            :disabled="tempConfig.sync.actionAfterSync == 'Exit' || tempConfig.sync.actionAfterSync == 'DoNothing'">
+            <ElInput v-model="tempConfig.sync.command" placeholder="同步后执行命令" clearable></ElInput>
         </ElFormItem>
 
         <ElFormItem label="要同步的Minecraft版本">
@@ -61,8 +87,9 @@ const querySearch = (queryString: string, cb: any) => {
             <ElCheckbox v-model="tempConfig.minecraft.syncConfig">同步配置文件</ElCheckbox>
         </ElFormItem>
         <ElFormItem label="操作">
-            <ElButton @click="syncConfigToStore">保存</ElButton>
-            <!-- <ElButton @click="configStore.config = tempConfig">恢复默认设置</ElButton> -->
+            <ElButton @click="saveConfig">保存</ElButton>
+            <ElButton @click="onDiscardChanges" :disabled="!changed">取消更改</ElButton>
+            <ElButton @click="onResetConfig">恢复默认配置</ElButton>
         </ElFormItem>
     </ElForm>
 </template>

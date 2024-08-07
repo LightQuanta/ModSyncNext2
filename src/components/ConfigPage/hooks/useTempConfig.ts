@@ -1,5 +1,5 @@
 import { computed, watch } from "vue"
-import { useConfigStore } from "@/store/config"
+import { defaultConfig, useConfigStore } from "@/store/config"
 import { useCloned } from '@vueuse/core'
 
 export default function useTempConfig() {
@@ -30,11 +30,21 @@ export default function useTempConfig() {
   // 对比字符串，如果内容多了性能可能变差
   const changed = computed(() => tempConfigJSON.value !== configJSON.value)
 
+  const discardChanges = () => {
+    tempConfig.value = JSON.parse(JSON.stringify(configStore.config))
+  }
+
+  const resetConfig = () => {
+    configStore.config = defaultConfig
+  }
+
   return {
     changed,
     tempConfig,
     syncConfigToStore,
     tempConfigJSON,
     configJSON,
+    discardChanges,
+    resetConfig,
   }
 }

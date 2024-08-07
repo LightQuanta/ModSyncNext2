@@ -18,8 +18,13 @@ const defaultConfig = {
     }
 }
 
+export { defaultConfig }
+
 export const useConfigStore = defineStore('config', () => {
     const config = ref<Config>({ ...defaultConfig })
+    const restore = () => {
+        config.value = { ...defaultConfig }
+    }
 
-    return { config }
+    return { config, restoreToDefault: restore }
 })
