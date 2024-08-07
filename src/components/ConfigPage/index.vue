@@ -56,6 +56,15 @@ const onResetConfig = () => {
         }
     ).then(resetConfig)
 }
+
+const getActionDisplayName = (action: ActionAfterSync) => {
+    switch (action) {
+        case "Exit": return "退出程序"
+        case "DoNothing": return "待命"
+        case "ExecuteCommand": return "执行命令"
+        case "ExecuteCommandAndExit": return "执行命令并退出"
+    }
+}
 </script>
 
 <template>
@@ -69,7 +78,8 @@ const onResetConfig = () => {
         </ElFormItem>
         <ElFormItem label="同步后行为">
             <ElSelect v-model="tempConfig.sync.actionAfterSync" placeholder="同步后行为">
-                <ElOption v-for="o in ActionAfterSync" :key="o" :label="o" :value="o" />
+                <ElOption v-for="action in ActionAfterSync" :key="action" :label="getActionDisplayName(action)"
+                    :value="action" />
             </ElSelect>
         </ElFormItem>
 
