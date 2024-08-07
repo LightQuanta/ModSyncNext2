@@ -19,7 +19,7 @@ const defaultConfig = {
 }
 
 export const useConfigStore = defineStore('config', () => {
-    const config = ref<Config>(defaultConfig)
+    const config = ref<Config>({ ...defaultConfig })
 
     return { config }
 })

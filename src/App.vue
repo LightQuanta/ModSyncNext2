@@ -6,7 +6,7 @@ import { ElMessage } from "element-plus"
 import { useConfigStore } from "@/store/config"
 
 import Main from "@/components/Main.vue";
-import ConfigPage from "@/components/ConfigPage.vue";
+import ConfigPage from "@/components/ConfigPage/index.vue";
 
 
 onMounted(async () => {
@@ -27,7 +27,7 @@ onMounted(async () => {
         showClose: true,
         duration: 0,
       })
-    
+
     }
   } catch (error) {
     ElMessage({
