@@ -1,8 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { ElAutocomplete, ElButton, ElInput, ElCheckbox, ElSelect, ElOption, ElForm, ElFormItem, ElMessage, ElMessageBox } from "element-plus";
+import {
+    ElAutocomplete,
+    ElButton,
+    ElInput,
+    ElCheckbox,
+    ElSelect,
+    ElOption,
+    ElForm,
+    ElFormItem,
+    ElMessage,
+    ElMessageBox,
+} from "element-plus";
 import { ActionAfterSync } from "@/config"
 import useTempConfig from './hooks/useTempConfig'
+import { invoke } from "@tauri-apps/api/tauri"
 
 const {
     tempConfig,
@@ -65,10 +77,17 @@ const getActionDisplayName = (action: ActionAfterSync) => {
         case "ExecuteCommandAndExit": return "执行命令并退出"
     }
 }
+
+const chooseFile = async () => {
+    const path: string | null = await invoke("choose_file")
+    if (path !== null) {
+        tempConfig.value.sync.command = path
+    }
+}
 </script>
 
 <template>
-    <ElForm label-width="auto">
+    <ElForm label-width="auto" class="m-4">
         <ElFormItem label="同步服务器网址">
             <ElInput v-model="tempConfig.sync.server" placeholder="同步服务器"></ElInput>
         </ElFormItem>
@@ -84,8 +103,13 @@ const getActionDisplayName = (action: ActionAfterSync) => {
         </ElFormItem>
 
         <ElFormItem label="同步后执行命令">
-            <ElInput v-model="tempConfig.sync.command" placeholder="同步后执行命令" clearable
-                :disabled="tempConfig.sync.actionAfterSync === 'Exit' || tempConfig.sync.actionAfterSync === 'DoNothing'" />
+            <div class="flex flex-row grow gap-1">
+                <ElInput class="grow" v-model="tempConfig.sync.command" placeholder="同步后执行命令" clearable
+                    :disabled="tempConfig.sync.actionAfterSync === 'Exit' || tempConfig.sync.actionAfterSync === 'DoNothing'" />
+                <ElButton @click="chooseFile"
+                    :disabled="tempConfig.sync.actionAfterSync === 'Exit' || tempConfig.sync.actionAfterSync === 'DoNothing'">
+                    浏览</ElButton>
+            </div>
         </ElFormItem>
 
         <ElFormItem label="要同步的Minecraft版本">

@@ -12,6 +12,12 @@ fn create_default_config() -> bool {
 }
 
 #[tauri::command]
+fn choose_file() -> Option<String> {
+    let file = rfd::FileDialog::new().set_directory("./").pick_file();
+    Some(file?.as_path().to_str()?.to_string())
+}
+
+#[tauri::command]
 fn read_config() -> String {
     match modsyncnext2::read_config() {
         Ok(config) => match serde_json::to_string(&config) {
@@ -28,6 +34,7 @@ fn main() {
             read_config,
             has_config,
             create_default_config,
+            choose_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
