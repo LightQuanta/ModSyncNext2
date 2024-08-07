@@ -5,14 +5,14 @@ import { Config, ActionAfterSync } from "@/config.ts"
 const defaultConfig = {
     version: "2.0",
     sync: {
-        server: "",
+        server: "http://example.com/",
         autoUpdate: false,
         autoSync: false,
         actionAfterSync: ActionAfterSync.DoNothing,
-        command: ""
+        command: "launch"
     },
     minecraft: {
-        version: "",
+        version: "1.20",
         isolate: false,
         syncConfig: false
     }
