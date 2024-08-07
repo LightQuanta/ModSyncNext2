@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/tauri"
 import { Config } from "@/config"
 import { ElMessage } from "element-plus"
@@ -39,6 +39,7 @@ onMounted(async () => {
   }
 })
 
+const configChanged = ref(false)
 </script>
 
 <template>
@@ -46,8 +47,8 @@ onMounted(async () => {
     <el-tab-pane label="Main">
       <Main></Main>
     </el-tab-pane>
-    <el-tab-pane label="Config">
-      <ConfigPage />
+    <el-tab-pane :label="'设置' + (configChanged ? '*' : '')">
+      <ConfigPage @changed="changed => configChanged = changed" />
     </el-tab-pane>
   </el-tabs>
 </template>

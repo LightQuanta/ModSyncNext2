@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watchEffect } from "vue"
 import {
     ElAutocomplete,
     ElButton,
@@ -23,6 +23,12 @@ const {
     discardChanges,
     resetConfig,
 } = useTempConfig()
+
+const emit = defineEmits<{
+    changed: [changed: boolean]
+}>()
+
+watchEffect(() => emit("changed", changed.value))
 
 // TODO 实现正确补全
 const list = ref([
@@ -106,7 +112,7 @@ const chooseFile = async () => {
             <div class="flex flex-row grow gap-1">
                 <ElInput class="grow" v-model="tempConfig.sync.command" placeholder="同步后执行命令" clearable
                     :disabled="tempConfig.sync.actionAfterSync === 'Exit' || tempConfig.sync.actionAfterSync === 'DoNothing'" />
-                <ElButton @click="chooseFile"
+                <ElButton type="primary" @click="chooseFile"
                     :disabled="tempConfig.sync.actionAfterSync === 'Exit' || tempConfig.sync.actionAfterSync === 'DoNothing'">
                     浏览</ElButton>
             </div>
@@ -121,9 +127,9 @@ const chooseFile = async () => {
             <ElCheckbox v-model="tempConfig.minecraft.syncConfig">同步配置文件</ElCheckbox>
         </ElFormItem>
         <ElFormItem label="操作">
-            <ElButton @click="saveConfig">保存</ElButton>
-            <ElButton @click="onDiscardChanges" :disabled="!changed">取消更改</ElButton>
-            <ElButton @click="onResetConfig">恢复默认配置</ElButton>
+            <ElButton type="primary" @click="saveConfig">保存</ElButton>
+            <ElButton class="mr-auto" @click="onDiscardChanges" :disabled="!changed">取消更改</ElButton>
+            <ElButton type="danger" @click="onResetConfig">恢复默认配置</ElButton>
         </ElFormItem>
     </ElForm>
 </template>
