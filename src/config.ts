@@ -6,10 +6,10 @@ interface Config {
 }
 
 enum ActionAfterSync {
-    Exit,
-    DoNothing,
-    ExecuteCommand,
-    ExecuteCommandAndExit,
+    Exit = "Exit",
+    DoNothing = "DoNothing",
+    ExecuteCommand = "ExecuteCommand",
+    ExecuteCommandAndExit = "ExecuteCommandAndExit",
 }
 
 interface Sync {

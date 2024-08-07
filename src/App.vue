@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/tauri"
 import { Config } from "@/config"
 import { ElMessage } from "element-plus"
 import { useConfigStore } from "@/store/config"
 
 import Main from "@/components/Main.vue";
+import ConfigPage from "@/components/ConfigPage.vue";
 
 
 onMounted(async () => {
@@ -38,9 +39,6 @@ onMounted(async () => {
   }
 })
 
-// TODO 实现正确的配置处理
-const tempConfigJSON = computed(() => JSON.stringify(useConfigStore().config, null, 4))
-
 </script>
 
 <template>
@@ -49,8 +47,7 @@ const tempConfigJSON = computed(() => JSON.stringify(useConfigStore().config, nu
       <Main></Main>
     </el-tab-pane>
     <el-tab-pane label="Config">
-      <!-- 临时Config预览 -->
-      <pre>{{ tempConfigJSON }}</pre>
+      <ConfigPage />
     </el-tab-pane>
   </el-tabs>
 </template>
