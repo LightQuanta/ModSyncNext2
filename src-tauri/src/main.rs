@@ -46,10 +46,19 @@ fn read_config() -> String {
     }
 }
 
+#[tauri::command]
+fn save_config(config: String) -> String {
+    match modsyncnext2::save_config(config) {
+        Ok(()) => "ok".to_string(),
+        Err(e) => e.to_string(),
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             read_config,
+            save_config,
             has_config,
             create_default_config,
             choose_file,

@@ -1,6 +1,7 @@
 import { computed, watch } from "vue"
 import { defaultConfig, useConfigStore } from "@/store/config"
 import { useCloned } from '@vueuse/core'
+import { invoke } from "@tauri-apps/api/tauri"
 
 export default function useTempConfig() {
   const configStore = useConfigStore()
@@ -14,10 +15,10 @@ export default function useTempConfig() {
   /**
    * 将 tempConfig 同步到 store
    */
-  const syncConfigToStore = () => {
+  const syncConfigToStore = async () => {
     // 创建一个全新对象，如果直接使用 tempConfig，由于深度的对象仍为 proxy 对象，会导致后续修改时发生响应式变化
     configStore.config = JSON.parse(JSON.stringify(tempConfig.value))
-    // TODO 在这里实现 tauri invoke 配置保存
+    return await invoke("save_config", { config: JSON.stringify(configStore.config) })
   }
 
   watch(() => configStore.config, () => {
@@ -36,6 +37,7 @@ export default function useTempConfig() {
 
   const resetConfig = () => {
     configStore.config = defaultConfig
+    tempConfig.value = defaultConfig
   }
 
   return {

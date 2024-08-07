@@ -43,12 +43,19 @@ const querySearch = (queryString: string, cb: any) => {
     cb(results)
 }
 
-const saveConfig = () => {
-    syncConfigToStore()
-    ElMessage({
-        message: "保存成功",
-        type: "success",
-    })
+const saveConfig = async () => {
+    const result = await syncConfigToStore()
+    if (result === "ok") {
+        ElMessage({
+            message: "保存成功",
+            type: "success",
+        })
+    } else {
+        ElMessage({
+            message: "保存失败：" + result,
+            type: "error",
+        })
+    }
 }
 
 const onDiscardChanges = () => {
@@ -72,7 +79,10 @@ const onResetConfig = () => {
             cancelButtonText: "取消",
             type: "warning",
         }
-    ).then(resetConfig)
+    ).then(async () => {
+        resetConfig()
+        saveConfig()
+    })
 }
 
 const getActionDisplayName = (action: ActionAfterSync) => {

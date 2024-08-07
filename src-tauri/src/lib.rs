@@ -62,7 +62,7 @@ pub struct Minecraft {
 const CONFIG_PATH: &str = "./msnconfig.txt";
 
 #[cfg(debug_assertions)]
-const CONFIG_PATH: &str = "./sample_config.toml";
+const CONFIG_PATH: &str = "../sample_config.toml";
 
 pub fn has_config() -> bool {
     fs::metadata(CONFIG_PATH).is_ok()
@@ -77,6 +77,12 @@ pub fn create_default_config() -> Result<(), Box<dyn std::error::Error>> {
 pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
     let config_text = fs::read_to_string(CONFIG_PATH)?;
     Ok(toml::from_str(&config_text)?)
+}
+
+pub fn save_config(config: String) -> Result<(), Box<dyn std::error::Error>> {
+    let config: Config = serde_json::from_str(&config)?;
+    let toml_string = toml::to_string(&config)?;
+    Ok(fs::write(CONFIG_PATH, toml_string)?)
 }
 
 pub fn select_file() -> Option<String> {
