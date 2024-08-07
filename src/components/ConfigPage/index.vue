@@ -73,9 +73,9 @@ const onResetConfig = () => {
             </ElSelect>
         </ElFormItem>
 
-        <ElFormItem label="同步后执行命令"
-            :disabled="tempConfig.sync.actionAfterSync == 'Exit' || tempConfig.sync.actionAfterSync == 'DoNothing'">
-            <ElInput v-model="tempConfig.sync.command" placeholder="同步后执行命令" clearable></ElInput>
+        <ElFormItem label="同步后执行命令">
+            <ElInput v-model="tempConfig.sync.command" placeholder="同步后执行命令" clearable
+                :disabled="tempConfig.sync.actionAfterSync === 'Exit' || tempConfig.sync.actionAfterSync === 'DoNothing'" />
         </ElFormItem>
 
         <ElFormItem label="要同步的Minecraft版本">
