@@ -87,10 +87,10 @@ const onResetConfig = () => {
 
 const getActionDisplayName = (action: ActionAfterSync) => {
     switch (action) {
-        case "Exit": return "退出程序"
-        case "DoNothing": return "待命"
-        case "ExecuteCommand": return "执行命令"
-        case "ExecuteCommandAndExit": return "执行命令并退出"
+        case ActionAfterSync.Exit: return "退出程序"
+        case ActionAfterSync.DoNothing: return "待命"
+        case ActionAfterSync.ExecuteCommand: return "执行命令"
+        case ActionAfterSync.ExecuteCommandAndExit: return "执行命令并退出"
     }
 }
 
