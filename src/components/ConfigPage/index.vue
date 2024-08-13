@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue"
+import { ref, watchEffect, onMounted } from "vue"
 import {
     ElAutocomplete,
     ElButton,
@@ -30,12 +30,12 @@ const emit = defineEmits<{
 
 watchEffect(() => emit("changed", changed.value))
 
-// TODO 实现正确补全
-const list = ref([
-    { value: "111" },
-    { value: "222" },
-    { value: "333" },
-])
+const list = ref([{ value: "111" }])
+
+onMounted(async () => {
+    list.value = (await invoke("get_minecraft_versions") as string[]).map(v => ({ value: v }))
+})
+
 const querySearch = (queryString: string, cb: any) => {
     const results = queryString
         ? list.value.filter(v => v.value.includes(queryString))

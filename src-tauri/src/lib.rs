@@ -1,6 +1,5 @@
-use std::{env, fs};
+use std::{fs, path::Path};
 
-use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
@@ -106,4 +105,35 @@ pub fn choose_file() -> Option<String> {
     }
 
     Some(path)
+}
+
+pub fn get_minecraft_versions() -> Vec<String> {
+    let minecraft_path = minecraft_path();
+    let path = Path::new(&minecraft_path);
+
+    let versions = path.join(".minecraft").join("versions");
+    let versions = fs::read_dir(versions);
+
+    if let Ok(files) = versions {
+        let paths: Vec<String> = files
+            .filter_map(|f| {
+                if let Ok(f) = f {
+                    return Some(f.path().file_name()?.to_str()?.to_string());
+                };
+                None
+            })
+            .collect();
+        return paths;
+    }
+    vec![]
+}
+
+fn minecraft_path() -> String {
+    let env = std::env::var("MINECRAFT_PATH");
+
+    if env.is_ok() {
+        env.unwrap()
+    } else {
+        ".".to_string() + std::path::MAIN_SEPARATOR_STR
+    }
 }

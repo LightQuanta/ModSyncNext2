@@ -17,6 +17,7 @@ serde_json = "1"
 reqwest = "0.12.5"
 toml = "0.8.15"
 rfd = "0.14.1"
+dotenvy = "0.15.7"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

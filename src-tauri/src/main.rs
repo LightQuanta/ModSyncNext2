@@ -35,7 +35,14 @@ fn save_config(config: String) -> String {
     }
 }
 
+#[tauri::command]
+fn get_minecraft_versions() -> Vec<String> {
+    modsyncnext2::get_minecraft_versions()
+}
+
 fn main() {
+    let _ = dotenvy::dotenv();
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             read_config,
@@ -43,6 +50,7 @@ fn main() {
             has_config,
             create_default_config,
             choose_file,
+            get_minecraft_versions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
