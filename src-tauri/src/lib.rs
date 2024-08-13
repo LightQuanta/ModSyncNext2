@@ -1,4 +1,7 @@
-use std::{fs, path::Path};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -108,8 +111,7 @@ pub fn choose_file() -> Option<String> {
 }
 
 pub fn get_minecraft_versions() -> Vec<String> {
-    let minecraft_path = minecraft_path();
-    let path = Path::new(&minecraft_path);
+    let path = minecraft_path();
 
     let versions = path.join(".minecraft").join("versions");
     let versions = fs::read_dir(versions);
@@ -127,12 +129,13 @@ pub fn get_minecraft_versions() -> Vec<String> {
     vec![]
 }
 
-fn minecraft_path() -> String {
+fn minecraft_path() -> PathBuf {
     let env = std::env::var("MINECRAFT_PATH");
 
-    if env.is_ok() {
+    let path = if env.is_ok() {
         env.unwrap()
     } else {
         ".".to_string() + std::path::MAIN_SEPARATOR_STR
-    }
+    };
+    Path::new(&path).to_path_buf()
 }
