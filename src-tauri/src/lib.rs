@@ -85,13 +85,25 @@ pub fn save_config(config: String) -> Result<(), Box<dyn std::error::Error>> {
     Ok(fs::write(CONFIG_PATH, toml_string)?)
 }
 
-pub fn select_file() -> Option<String> {
-    let file = FileDialog::new()
-        .add_filter("*", &["*.*"])
-        .set_directory(env::current_dir().unwrap())
+pub fn choose_file() -> Option<String> {
+    // 计算当前目录的相对和绝对路径
+    let current_relative_dir = &(".".to_string() + std::path::MAIN_SEPARATOR_STR);
+    let current_dir = if let Ok(dir) = std::env::current_dir() {
+        &dir.to_str()?.to_string()
+    } else {
+        current_relative_dir
+    };
+
+    // 选择文件
+    let file = rfd::FileDialog::new()
+        .set_directory(current_dir)
         .pick_file();
-    if let Some(file) = file {
-        return Some(file.to_str()?.to_string());
+    let mut path = file?.as_path().to_str()?.to_string();
+
+    // 对于同目录下的文件，计算相对路径
+    if path.starts_with(current_dir) {
+        path.replace_range(..(current_dir.len() + 1), current_relative_dir);
     }
-    None
+
+    Some(path)
 }

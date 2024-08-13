@@ -13,26 +13,7 @@ fn create_default_config() -> bool {
 
 #[tauri::command]
 fn choose_file() -> Option<String> {
-    // 计算当前目录的相对和绝对路径
-    let current_relative_dir = &(".".to_string() + std::path::MAIN_SEPARATOR_STR);
-    let current_dir = if let Ok(dir) = std::env::current_dir() {
-        &dir.to_str()?.to_string()
-    } else {
-        current_relative_dir
-    };
-
-    // 选择文件
-    let file = rfd::FileDialog::new()
-        .set_directory(current_dir)
-        .pick_file();
-    let mut path = file?.as_path().to_str()?.to_string();
-
-    // 对于同目录下的文件，计算相对路径
-    if path.starts_with(current_dir) {
-        path.replace_range(..(current_dir.len() + 1), current_relative_dir);
-    }
-
-    Some(path)
+    modsyncnext2::choose_file()
 }
 
 #[tauri::command]
