@@ -87,27 +87,36 @@ pub fn save_config(config: String) -> Result<(), Box<dyn std::error::Error>> {
     Ok(fs::write(CONFIG_PATH, toml_string)?)
 }
 
-pub fn choose_file() -> Option<String> {
-    // 计算当前目录的相对和绝对路径
-    let current_relative_dir = &(".".to_string() + std::path::MAIN_SEPARATOR_STR);
-    let current_dir = if let Ok(dir) = std::env::current_dir() {
-        &dir.to_str()?.to_string()
-    } else {
-        current_relative_dir
-    };
+fn to_relative_path_string(path: &PathBuf) -> Option<String> {
+    let current_relative_dir = ".".to_string() + std::path::MAIN_SEPARATOR_STR;
+    // 对于同目录下的文件，计算相对路径
+    let current_dir = current_dir();
+    let current_dir = current_dir.to_str().unwrap_or(&current_relative_dir);
+    if path.starts_with(&current_dir) {
+        let mut path = path.to_str().unwrap_or(&current_relative_dir).to_string();
+        path.replace_range(..(current_dir.len() + 1), &current_relative_dir);
+        return Some(path);
+    }
+    Some(path.to_str()?.to_string())
+}
 
+fn current_dir() -> PathBuf {
+    // 计算当前目录的相对和绝对路径
+    let current_relative_dir = ".".to_string() + std::path::MAIN_SEPARATOR_STR;
+    if let Ok(dir) = std::env::current_dir() {
+        dir
+    } else {
+        Path::new(&current_relative_dir).to_path_buf()
+    }
+}
+
+pub fn choose_file() -> Option<String> {
     // 选择文件
     let file = rfd::FileDialog::new()
-        .set_directory(current_dir)
+        .set_directory(current_dir())
         .pick_file();
-    let mut path = file?.as_path().to_str()?.to_string();
 
-    // 对于同目录下的文件，计算相对路径
-    if path.starts_with(current_dir) {
-        path.replace_range(..(current_dir.len() + 1), current_relative_dir);
-    }
-
-    Some(path)
+    to_relative_path_string(&file?.as_path().to_path_buf())
 }
 
 pub fn get_minecraft_versions() -> Vec<String> {
