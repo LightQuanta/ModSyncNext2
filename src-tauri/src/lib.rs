@@ -115,7 +115,7 @@ pub fn get_minecraft_versions() -> Vec<String> {
     let versions = fs::read_dir(versions);
 
     if let Ok(files) = versions {
-        let paths: Vec<String> = files
+        return files
             .filter_map(|f| {
                 if let Ok(f) = f {
                     return Some(f.path().file_name()?.to_str()?.to_string());
@@ -123,7 +123,6 @@ pub fn get_minecraft_versions() -> Vec<String> {
                 None
             })
             .collect();
-        return paths;
     }
     vec![]
 }
