@@ -152,6 +152,11 @@ lazy_static! {
         Mutex::new(read_hash_cache().unwrap_or(HashMap::new()));
 }
 
+/// 根据修改日期和文件大小检测mod是否发生变化
+fn has_file_changed(file1: &FileHashInfo, file2: &FileHashInfo) -> bool {
+    file1.last_modified != file2.last_modified || file1.size != file2.size
+}
+
 /// 获得某个mod的文件信息
 fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
     // 必须是文件
@@ -178,24 +183,30 @@ fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
     // TODO 缓存path
     let mut hashmap = HASH.lock().unwrap();
 
+    let mut current_file_info = FileHashInfo {
+        name: f.file_name().to_string_lossy().to_string(),
+        size,
+        last_modified,
+        hash: "temp".to_string(),
+    };
+
+    let cached_file_info = hashmap.get(&path);
+
     // 检查缓存
-    if hashmap.contains_key(&path) {
-        let fhi = hashmap.get(&path).unwrap().clone();
+    if cached_file_info.is_some() && !has_file_changed(&cached_file_info.unwrap(), &current_file_info) {
+        eprintln!("cached file {}", current_file_info.name);
+        let fhi = cached_file_info.unwrap().clone();
         return Ok(Some(fhi));
     } else {
+        eprintln!("new file {}", current_file_info.name);
         // 大写sha256
         let hash = compute_sha256(Path::new(&f.path()).to_path_buf())?;
-        let s = FileHashInfo {
-            name: f.file_name().to_string_lossy().to_string(),
-            size,
-            last_modified,
-            hash,
-        };
+        current_file_info.hash = hash;
 
-        hashmap.insert(path, s.clone());
+        hashmap.insert(path, current_file_info.clone());
         // TODO 保存hashmap缓存
 
-        Ok(Some(s))
+        Ok(Some(current_file_info))
     }
 }
 
