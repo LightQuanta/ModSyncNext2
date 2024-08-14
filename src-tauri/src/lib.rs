@@ -243,13 +243,22 @@ fn compute_sha256(path: PathBuf) -> Result<String, Box<dyn Error>> {
     Ok(format!("{:X}", hasher.finalize()))
 }
 
+/// 获得mods文件夹路径（支持版本隔离）
+fn mods_path(version: String) -> PathBuf {
+    if CONFIG.read().unwrap().minecraft.isolate {
+        minecraft_path().join(".minecraft").join("mods")
+    } else {
+        minecraft_path()
+            .join(".minecraft")
+            .join("versions")
+            .join(version)
+            .join("mods")
+    }
+}
+
 /// 获得某个版本的全部mod的文件信息
 pub fn get_mods_info(version: String) -> Vec<FileHashInfo> {
-    let mod_folder = minecraft_path()
-        .join(".minecraft")
-        .join("versions")
-        .join(version)
-        .join("mods");
+    let mod_folder = mods_path(version);
 
     eprintln!("mod_folder = {:?}", mod_folder);
     let mods = fs::read_dir(mod_folder);
