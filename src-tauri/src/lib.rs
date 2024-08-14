@@ -150,7 +150,7 @@ fn read_hash_cache() -> Option<HashMap<String, FileHashInfo>> {
 /// 将缓存的文件信息保存至MSN/hash.json
 fn save_hash_cache() -> Result<(), Box<dyn Error>> {
     let hashmap = HASH.lock().unwrap().clone();
-    let json = serde_json::to_string(&hashmap)?;
+    let json = serde_json::to_string_pretty(&hashmap)?;
     Ok(fs::write(
         minecraft_path().join("MSN").join("hash.json"),
         json.as_bytes(),
