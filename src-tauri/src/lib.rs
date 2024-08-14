@@ -94,11 +94,14 @@ pub fn save_config(config: String) -> Result<(), Box<dyn std::error::Error>> {
     Ok(fs::write(CONFIG_PATH, toml_string)?)
 }
 
+/// 尝试将绝对路径转换为相对Minecraft文件夹下的路径
 fn to_relative_path_string(path: &PathBuf) -> Option<String> {
     let current_relative_dir = ".".to_string() + std::path::MAIN_SEPARATOR_STR;
     // 对于同目录下的文件，计算相对路径
     let current_dir = minecraft_path();
     let current_dir = current_dir.to_str().unwrap_or(&current_relative_dir);
+
+    // 移除同目录前的额外路径，替换为相对路径
     if path.starts_with(&current_dir) {
         let mut path = path.to_str().unwrap_or(&current_relative_dir).to_string();
         path.replace_range(..(current_dir.len() + 1), &current_relative_dir);
@@ -116,7 +119,19 @@ pub struct FileHashInfo {
     hash: String,
 }
 
+/// 确保配置文件夹存在
+fn make_config_dir() {
+    let config_folder = minecraft_path().join("MSN");
+    if !config_folder.exists() {
+        if let Err(e) = fs::create_dir(config_folder) {
+            eprintln!("Error while creating config folder: {:?}", e);
+        }
+    }
+}
+
+/// 读取MSN/hash.json中缓存的mod文件信息缓存
 fn read_hash_cache() -> Option<HashMap<String, FileHashInfo>> {
+    make_config_dir();
     let json = fs::read_to_string(minecraft_path().join("MSN/hash.json"))
         .unwrap_or("cache file not found!".to_string());
     let parsed = serde_json::from_str(&json);
@@ -137,6 +152,7 @@ lazy_static! {
         Mutex::new(read_hash_cache().unwrap_or(HashMap::new()));
 }
 
+/// 获得某个mod的文件信息
 fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
     // 必须是文件
     if !f.file_type().map_or(false, |f| f.is_file()) {
@@ -176,16 +192,14 @@ fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
             hash,
         };
 
-        hashmap.insert(
-            path,
-            s.clone(),
-        );
+        hashmap.insert(path, s.clone());
         // TODO 保存hashmap缓存
 
         Ok(Some(s))
     }
 }
 
+/// 计算并返回指定文件的大写SHA256字符串
 fn compute_sha256(path: PathBuf) -> Result<String, Box<dyn Error>> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
@@ -196,6 +210,7 @@ fn compute_sha256(path: PathBuf) -> Result<String, Box<dyn Error>> {
     Ok(format!("{:X}", hasher.finalize()))
 }
 
+/// 获得某个版本的全部mod的文件信息
 pub fn get_mods_info(version: String) -> Vec<FileHashInfo> {
     let mod_folder = minecraft_path()
         .join(".minecraft")
@@ -236,6 +251,7 @@ pub fn choose_file() -> Option<String> {
     to_relative_path_string(&file?.as_path().to_path_buf())
 }
 
+/// 获得.minecraft/versions下的所有Minecraft版本名称
 pub fn get_minecraft_versions() -> Vec<String> {
     let path = minecraft_path();
 
@@ -258,6 +274,7 @@ pub fn get_minecraft_versions() -> Vec<String> {
     vec![]
 }
 
+/// 获得.minecraft文件夹所在目录，优先读取环境变量MINECRAFT_PATH指定的目录，默认为当前目录
 fn minecraft_path() -> PathBuf {
     let env = std::env::var("MINECRAFT_PATH");
 
