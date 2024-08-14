@@ -74,7 +74,7 @@ const CONFIG_PATH: &str = "./msnconfig.txt";
 const CONFIG_PATH: &str = "../sample_config.toml";
 
 lazy_static! {
-    static ref CONFIG: RwLock<Config> = RwLock::new(read_config().unwrap_or(Config::default()));
+    static ref CONFIG: RwLock<Config> = RwLock::new(Config::default());
 }
 
 /// 替换当前配置
