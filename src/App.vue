@@ -43,12 +43,18 @@ const configChanged = ref(false)
 </script>
 
 <template>
-  <el-tabs class="w-full" stretch="true">
-    <el-tab-pane label="Main">
+  <ElTabs class="w-full" :stretch="true">
+    <ElTabPane label="Main">
       <Main></Main>
-    </el-tab-pane>
-    <el-tab-pane :label="'设置' + (configChanged ? '*' : '')">
+    </ElTabPane>
+    <ElTabPane :label="'设置' + (configChanged ? '*' : '')">
       <ConfigPage @changed="changed => configChanged = changed" />
-    </el-tab-pane>
-  </el-tabs>
+    </ElTabPane>
+  </ElTabs>
 </template>
+
+<style scoped>
+.el-tabs :deep(.el-tabs__header) {
+  margin-bottom: 0;
+}
+</style>
