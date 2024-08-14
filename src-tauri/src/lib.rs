@@ -96,7 +96,9 @@ pub fn create_default_config() -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
     let config_text = fs::read_to_string(CONFIG_PATH)?;
-    Ok(toml::from_str(&config_text)?)
+    let config: Config = toml::from_str(&config_text)?;
+    replace_current_config(config.clone());
+    Ok(config)
 }
 
 pub fn save_config(config: String) -> Result<(), Box<dyn std::error::Error>> {
