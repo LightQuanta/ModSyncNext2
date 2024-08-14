@@ -190,7 +190,6 @@ fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
     let path = path.unwrap();
     eprintln!("relative_path = {:?}", path);
 
-    // TODO 缓存path
     let mut hashmap = HASH.lock().unwrap();
 
     let mut current_file_info = FileHashInfo {
@@ -216,7 +215,6 @@ fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
         current_file_info.hash = hash;
 
         hashmap.insert(path, current_file_info.clone());
-        // TODO 保存hashmap缓存
 
         Ok(Some(current_file_info))
     }

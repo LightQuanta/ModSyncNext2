@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/tauri"
-import { Config } from "@/config"
 import useTempConfig from '@/components/ConfigPage/hooks/useTempConfig'
 
 // TODO 实现主界面
