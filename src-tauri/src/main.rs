@@ -1,6 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::env;
+
+use modsyncnext2::FileHashInfo;
+
 #[tauri::command]
 fn has_config() -> bool {
     modsyncnext2::has_config()
@@ -40,6 +44,11 @@ fn get_minecraft_versions() -> Vec<String> {
     modsyncnext2::get_minecraft_versions()
 }
 
+#[tauri::command]
+fn get_mods_info(version: String) -> Vec<FileHashInfo> {
+    modsyncnext2::get_mods_info(version)
+}
+
 fn main() {
     let _ = dotenvy::dotenv();
 
@@ -51,6 +60,7 @@ fn main() {
             create_default_config,
             choose_file,
             get_minecraft_versions,
+            get_mods_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

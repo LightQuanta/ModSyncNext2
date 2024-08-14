@@ -2,23 +2,25 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/tauri"
 import { Config } from "@/config"
+import useTempConfig from '@/components/ConfigPage/hooks/useTempConfig'
 
 // TODO 实现主界面
 
-const greetMsg = ref("")
-const path = ref("")
+const {
+  tempConfig
+} = useTempConfig()
+const resp = ref("")
 
 async function greet() {
-  const config: Config = JSON.parse(await invoke("greet", { path: path.value }))
-  greetMsg.value = JSON.stringify(config, null, 4)
+
+  resp.value = await invoke("get_mods_info", { version: tempConfig.value.minecraft.version })
 }
 </script>
 
 <template>
-  <form class="row" @submit.prevent="greet">
-    <p>Input config path</p>
-    <input id="greet-input" v-model="path" placeholder="Input config path" />
-    <button type="submit">Greet</button>
+  <form class="row" @submit.prevent>
+    <button @click="greet()" type="submit">Greet</button>
   </form>
-  <pre>{{ greetMsg }}</pre>
+  <pre>{{ tempConfig.minecraft.version }}</pre>
+  <pre>{{ resp }}</pre>
 </template>
