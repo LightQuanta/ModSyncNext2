@@ -5,7 +5,7 @@ use std::{
     io::BufReader,
     os::windows::fs::MetadataExt,
     path::{Path, PathBuf},
-    sync::Mutex,
+    sync::{Mutex, RwLock},
     time::UNIX_EPOCH,
 };
 
@@ -13,7 +13,7 @@ use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Config {
     version: String,
     sync: Sync,
@@ -40,7 +40,7 @@ impl Config {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub enum ActionAfterSync {
     Exit,
     DoNothing,
@@ -48,7 +48,7 @@ pub enum ActionAfterSync {
     ExecuteCommandAndExit,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Sync {
     server: String,
     #[serde(rename = "autoUpdate")]
@@ -60,7 +60,7 @@ pub struct Sync {
     command: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Minecraft {
     version: String,
     isolate: bool,
@@ -73,12 +73,23 @@ const CONFIG_PATH: &str = "./msnconfig.txt";
 #[cfg(debug_assertions)]
 const CONFIG_PATH: &str = "../sample_config.toml";
 
+lazy_static! {
+    static ref CONFIG: RwLock<Config> = RwLock::new(read_config().unwrap_or(Config::default()));
+}
+
+/// 替换当前配置
+fn replace_current_config(config: Config) {
+    let mut current_config = CONFIG.write().unwrap();
+    *current_config = config;
+}
+
 pub fn has_config() -> bool {
     fs::metadata(CONFIG_PATH).is_ok()
 }
 
 pub fn create_default_config() -> Result<(), Box<dyn std::error::Error>> {
     let default_config = Config::default();
+    replace_current_config(default_config.clone());
     fs::write(CONFIG_PATH, toml::to_string(&default_config).unwrap()).unwrap();
     Ok(())
 }
@@ -90,6 +101,7 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
 
 pub fn save_config(config: String) -> Result<(), Box<dyn std::error::Error>> {
     let config: Config = serde_json::from_str(&config)?;
+    replace_current_config(config.clone());
     let toml_string = toml::to_string(&config)?;
     Ok(fs::write(CONFIG_PATH, toml_string)?)
 }
