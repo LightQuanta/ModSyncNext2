@@ -147,6 +147,16 @@ fn read_hash_cache() -> Option<HashMap<String, FileHashInfo>> {
     }
 }
 
+/// 将缓存的文件信息保存至MSN/hash.json
+fn save_hash_cache() -> Result<(), Box<dyn Error>> {
+    let hashmap = HASH.lock().unwrap().clone();
+    let json = serde_json::to_string(&hashmap)?;
+    Ok(fs::write(
+        minecraft_path().join("MSN").join("hash.json"),
+        json.as_bytes(),
+    )?)
+}
+
 lazy_static! {
     static ref HASH: Mutex<HashMap<String, FileHashInfo>> =
         Mutex::new(read_hash_cache().unwrap_or(HashMap::new()));
@@ -193,7 +203,9 @@ fn get_mod_info(f: DirEntry) -> Result<Option<FileHashInfo>, Box<dyn Error>> {
     let cached_file_info = hashmap.get(&path);
 
     // 检查缓存
-    if cached_file_info.is_some() && !has_file_changed(&cached_file_info.unwrap(), &current_file_info) {
+    if cached_file_info.is_some()
+        && !has_file_changed(&cached_file_info.unwrap(), &current_file_info)
+    {
         eprintln!("cached file {}", current_file_info.name);
         let fhi = cached_file_info.unwrap().clone();
         return Ok(Some(fhi));
@@ -233,7 +245,7 @@ pub fn get_mods_info(version: String) -> Vec<FileHashInfo> {
     let mods = fs::read_dir(mod_folder);
 
     if let Ok(mods) = mods {
-        return mods
+        let mods_info = mods
             .filter_map(|f| {
                 if !f.is_ok() {
                     eprintln!("F NOT OK");
@@ -248,6 +260,11 @@ pub fn get_mods_info(version: String) -> Vec<FileHashInfo> {
                 return None;
             })
             .collect();
+        if let Err(e) = save_hash_cache() {
+            eprintln!("Error saving hash cache: {:?}", e);
+        }
+
+        return mods_info;
     }
     eprintln!("NOT OK? {:?}", mods.unwrap_err());
     vec![]
