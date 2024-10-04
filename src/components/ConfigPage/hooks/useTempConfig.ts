@@ -1,7 +1,7 @@
 import { computed, watch } from "vue"
 import { defaultConfig, useConfigStore } from "@/store/config"
 import { useCloned } from '@vueuse/core'
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 
 export default function useTempConfig() {
   const configStore = useConfigStore()

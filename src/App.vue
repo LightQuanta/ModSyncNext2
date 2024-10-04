@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 import { Config } from "@/config"
 import { ElMessage } from "element-plus"
 import { useConfigStore } from "@/store/config"

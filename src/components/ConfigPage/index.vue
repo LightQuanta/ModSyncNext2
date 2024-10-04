@@ -14,7 +14,7 @@ import {
 } from "element-plus";
 import { ActionAfterSync } from "@/config"
 import useTempConfig from './hooks/useTempConfig'
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 
 const {
     tempConfig,
@@ -44,6 +44,9 @@ const querySearch = (queryString: string, cb: any) => {
 }
 
 const saveConfig = async () => {
+    if (!tempConfig.value.sync.server.endsWith("/")) {
+        tempConfig.value.sync.server += "/"
+    }
     const result = await syncConfigToStore()
     if (result === "ok") {
         ElMessage({

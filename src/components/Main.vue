@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
+import { open } from "@tauri-apps/plugin-shell"
 import { ElButton, ElCarousel, ElCarouselItem, ElStep, ElSteps } from 'element-plus'
 import useTempConfig from '@/components/ConfigPage/hooks/useTempConfig'
 import { Download, Delete, List } from '@element-plus/icons-vue'
@@ -16,6 +17,11 @@ async function greet() {
   resp.value = await invoke("get_mods_info", { version: tempConfig.value.minecraft.version })
 }
 
+async function fetchVersionInfo() {
+  const info = await invoke("fetch_version_info", { version: tempConfig.value.minecraft.version })
+  console.log(info)
+}
+
 const carousel = ref()
 const prev = () => {
   carousel.value.prev()
@@ -26,6 +32,10 @@ const next = () => {
   index.value++
 }
 const index = ref(-1)
+
+const run = async () => {
+  await open(tempConfig.value.sync.command)
+}
 </script>
 
 <template>
@@ -43,6 +53,7 @@ const index = ref(-1)
     </ElCarouselItem>
     <ElCarouselItem class="bg-yellow-50">
       获取同步信息
+      <ElButton @click="fetchVersionInfo()">fetch</ElButton>
     </ElCarouselItem>
     <ElCarouselItem class="bg-red-300">
       删除多余mod
@@ -52,6 +63,7 @@ const index = ref(-1)
     </ElCarouselItem>
     <ElCarouselItem class="bg-green-200">
       完成
+      <ElButton @click="run()">CMD</ElButton>
     </ElCarouselItem>
   </ElCarousel>
   <ElButton @click="prev">prev</ElButton>
